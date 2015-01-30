@@ -73,6 +73,10 @@
   service: name=deluged state=started
   when: deluged_installed|changed
 
+- name: Wait a few seconds
+  pause: seconds=5
+  when: deluged_installed|changed
+
 - name: Stop deluged in order to update its conf file
   service: name=deluged state=stopped
   notify: Restart deluged

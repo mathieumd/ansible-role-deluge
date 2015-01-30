@@ -1,6 +1,8 @@
 Ansible role for Deluge
 =========
 
+[![Build Status](https://travis-ci.org/mathieumd/ansible-role-deluge.svg)](https://travis-ci.org/mathieumd/ansible-role-deluge)
+
 Install and update [Deluge](http://deluge-torrent.org/).
 
 Loosely based on [jgrowl/ansible-playbook-deluge](https://github.com/jgrowl/ansible-playbook-deluge).

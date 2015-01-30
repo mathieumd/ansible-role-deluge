@@ -60,8 +60,7 @@
   notify: Restart deluged
 
 - name: Create log directory
-  file: dest="{{ deluge_logs }}"
-        recurse=yes state=directory
+  file: dest="{{ deluge_logs }}" state=directory
         owner="{{ deluge_user }}" group="{{ deluge_group }}" mode=0750
 
 - name: Deploy Logrotate configuration

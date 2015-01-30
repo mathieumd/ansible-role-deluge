@@ -1,0 +1,42 @@
+---
+# https://servercheck.in/blog/testing-ansible-roles-travis-ci-github
+language: python
+python: "2.7"
+
+env:
+  - PLAYBOOK=tests/test-travis.yml
+    INVENTORY=tests/inventory-travis
+
+before_install:
+  # Make sure everything's up to date.
+  - sudo apt-get update
+
+install:
+  # Install Ansible.
+  - pip install ansible
+  # Add ansible.cfg to pick up roles path.
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  # Automatically create the inventory
+  - "echo 'localhost' > $INVENTORY"
+
+script:
+  # Check the role/playbook's syntax.
+  - "ansible-playbook -i $INVENTORY $PLAYBOOK --syntax-check"
+
+  # Run the role/playbook with ansible-playbook.
+  - "ansible-playbook -i $INVENTORY $PLAYBOOK --connection=local --sudo"
+
+  # Run the role/playbook again, checking to make sure it's idempotent.
+  - >
+    ansible-playbook -i $INVENTORY $PLAYBOOK --connection=local --sudo
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
+
+  # Request a page via the web server, to make sure it's running and responds.
+  #- curl --head --insecure https://localhost/
+
+  # Verify a known port is opened
+  - sudo netstat -tlnp | grep ":58846"
+
+

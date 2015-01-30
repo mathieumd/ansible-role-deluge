@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  remote_user: travis
+  roles:
+    - ansible-role-deluge # Must be the name of the Git repo
+
+# vim: ft=ansible

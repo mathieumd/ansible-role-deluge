@@ -14,6 +14,7 @@
   with_items:
     - deluged
     - deluge-console
+  register: deluged_installed
 
 - name: Install Deluge Web UI
   apt: name=deluge-web state=latest
@@ -66,6 +67,16 @@
 ######################################################################
 # Configuration
 ######################################################################
+
+# Let deluged create the core.conf file then stop it
+- name: Start deluged daemon if just installed
+  service: name=deluged state=started
+  when: deluged_installed|changed
+
+- name: Stop deluged in order to update its conf file
+  service: name=deluged state=stopped
+  notify: Restart deluged
+  when: deluged_installed|changed
 
 - name: Enable remote access
   replace:

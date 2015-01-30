@@ -1,0 +1,7 @@
+---
+- hosts: deluge
+  remote_user: vagrant
+  roles:
+      - ../../ansible-role-deluge
+
+# vim: ft=ansible

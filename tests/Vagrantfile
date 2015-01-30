@@ -1,0 +1,12 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.define "deluge"
+  config.vm.hostname = "deluge.example.test"
+  config.vm.network "public_network", bridge: "eth0"
+  config.vm.provision "ansible" do |a|
+      a.playbook = "test-vagrant.yml"
+      a.sudo = true
+      a.limit = "all"
+  end
+end
+# vim: ft=ruby

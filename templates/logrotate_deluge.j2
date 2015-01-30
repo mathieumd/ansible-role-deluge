@@ -1,0 +1,13 @@
+{{ deluge_logs }}/*.log {
+    rotate 8
+    weekly
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    postrotate
+        initctl restart deluged >/dev/null 2>&1 || true
+        initctl restart deluge-web >/dev/null 2>&1 || true
+    endscript
+}

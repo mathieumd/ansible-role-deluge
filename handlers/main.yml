@@ -1,0 +1,6 @@
+---
+# handlers file for deluge
+
+- name: Restart deluged
+  service: name=deluged state=restarted
+

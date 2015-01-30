@@ -14,21 +14,10 @@
   with_items:
     - deluged
     - deluge-console
-  register: deluged_installed
 
 - name: Install Deluge Web UI
   apt: name=deluge-web state=latest
   when: deluge_web
-
-######################################################################
-# First, stop deluged
-######################################################################
-
-- name: Temporarily stop deluged (if present and running)
-  service: name=deluged state=stopped
-  changed_when: false
-  ignore_errors: yes
-  notify: Restart deluged
 
 ######################################################################
 # User deluge
@@ -38,9 +27,24 @@
   user: name="{{ deluge_user }}" group="{{ deluge_group }}"
         system=yes state=present
 
+#=====================================================================
+
+- name: Check if user's home is correct
+  command: egrep "^{{ deluge_user}}:.*:{{ deluge_home }}:" /etc/passwd
+  ignore_errors: yes
+  register: user_home
+  changed_when: false
+
+- name: Temporarily stop deluged (if present and running)
+  service: name=deluged state=stopped
+  ignore_errors: yes
+  notify: Restart deluged
+  when: user_home.rc == 1
+
 - name: Set user's home
   user: name="{{ deluge_user }}" home="{{ deluge_home }}"
         move_home=yes
+  when: user_home.rc == 1
 
 ######################################################################
 # System
@@ -68,27 +72,34 @@
 # Configuration
 ######################################################################
 
+- name: Check that core.conf file is present
+  stat: path='{{ deluge_home }}/.config/deluge/core.conf'
+  changed_when: false
+  register: file_coreconf
+
 # Let deluged create the core.conf file then stop it
 - name: Start deluged daemon if just installed
   service: name=deluged state=started
-  when: deluged_installed|changed
+  when: file_coreconf.stat.exists is defined and file_coreconf.stat.exists == false
 
-- name: Wait a few seconds
-  pause: seconds=5
-  when: deluged_installed|changed
+- name: Pause 2s before stopping deluged
+  pause: seconds=2
+  when: file_coreconf.stat.exists is defined and file_coreconf.stat.exists == false
 
-- name: Stop deluged in order to update its conf file
+- name: Stop deluged so it write-down its conf file
   service: name=deluged state=stopped
   notify: Restart deluged
-  when: deluged_installed|changed
+  when: file_coreconf.stat.exists is defined and file_coreconf.stat.exists == false
+
+#=====================================================================
 
 - name: Enable remote access
   replace:
     dest: '{{ deluge_home }}/.config/deluge/core.conf'
     regexp: '^(.*"allow_remote"): .*'
     replace: '\1: true, '
-  when: deluge_allow_remote
   notify: Restart deluged
+  when: deluge_allow_remote
 
 - name: Add Deluge's own users
   lineinfile: dest="{{ deluge_home }}/.config/deluge/auth"

@@ -43,8 +43,13 @@
 
 - name: Set user's home
   user: name="{{ deluge_user }}" home="{{ deluge_home }}"
-        move_home=yes
+        #move_home=yes
   when: user_home.rc == 1
+
+- name: Set right permissions on user's home
+  file: path="{{ deluge_home }}"
+        owner="{{ deluge_user }}" group="{{ deluge_group }}"
+        recurse=yes state=directory
 
 ######################################################################
 # System
@@ -103,7 +108,8 @@
 - name: Add Deluge's own users
   lineinfile: dest="{{ deluge_home }}/.config/deluge/auth"
               regexp="^{{ item.key }}:"
-              line="{{ item.key }}:{{ lookup('password', '../vars/deluge_users/' + item.key) }}:{{ item.value.level }}"
+              line="{{ item.key }}:{{ lookup('password',
+                deluge_users_pass_path + '/deluge/' + item.key) }}:{{ item.value.level }}"
   with_dict: deluge_users
   notify: Restart deluged
 

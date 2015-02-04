@@ -14,7 +14,8 @@ deluge_allow_remote: yes
 deluge_web: no
 
 # http://dev.deluge-torrent.org/wiki/UserGuide/Authentication
-# Passwords are saved in "vars/deluge_users/<username>"
+# Passwords are saved in "vars/users/deluge/<username>"
+deluge_users_pass_path: "{{ credentials_path | default('../vars/users') }}"
 deluge_users:
   RemoteUser:
     level: 10

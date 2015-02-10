@@ -64,6 +64,13 @@
     - deluge-web.conf
   notify: Restart deluged
 
+- name: Remove deluge-web Upstart startup script
+  file: path="/etc/init/{{ item }}" state=absent
+  with_items:
+    - deluge-web.conf
+  when: not deluge_web
+  notify: Restart deluged
+
 - name: Create log directory
   file: dest="{{ deluge_logs }}" state=directory
         owner="{{ deluge_user }}" group="{{ deluge_group }}" mode=0750

@@ -7,7 +7,7 @@
 description "Deluge daemon"
 author "Deluge Team"
 
-start on virtual-filesystems and started networking
+start on virtual-filesystems and static-network-up
 stop on runlevel [016]
 
 respawn

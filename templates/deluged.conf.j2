@@ -1,4 +1,5 @@
 # deluged - Deluge daemon
+# {{ ansible_managed }}
 #
 # The daemon component of Deluge BitTorrent client. Deluge UI clients
 # connect to this daemon via DelugeRPC protocol.
@@ -6,7 +7,7 @@
 description "Deluge daemon"
 author "Deluge Team"
 
-start on filesystem and stopped networking
+start on virtual-filesystems and started networking
 stop on runlevel [016]
 
 respawn

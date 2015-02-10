@@ -56,12 +56,19 @@
 ######################################################################
 # http://dev.deluge-torrent.org/wiki/UserGuide/Service/Upstart
 
-- name: Deploy Upstart startup scripts
+- name: Deploy deluged Upstart startup script
   template: src="{{ item }}.j2" dest="/etc/init/{{ item }}"
-            owner=root group=root mode=0755
+            owner=root group=root mode=0644
   with_items:
     - deluged.conf
+  notify: Restart deluged
+
+- name: Deploy deluge-web Upstart startup script
+  template: src="{{ item }}.j2" dest="/etc/init/{{ item }}"
+            owner=root group=root mode=0644
+  with_items:
     - deluge-web.conf
+  when: deluge_web
   notify: Restart deluged
 
 - name: Remove deluge-web Upstart startup script
